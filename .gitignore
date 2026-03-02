@@ -1,0 +1,34 @@
+# Gradle
+.gradle/
+build/
+*/build/
+
+# Android Studio/IntelliJ
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/gradle.xml
+.idea/assetWizardExports.xml
+.idea/dictionaries
+.idea/libraries
+.idea/caches
+.idea/modules.xml
+.idea/runConfigurations.xml
+*.iml
+*.ipr
+*.iws
+
+# Локальные настройки (пути к SDKключи)
+local.properties
+
+# Подпись (KeyStore) - Никогда не добавляйте файлы ключей в репозиторий!
+*.jks
+*.keystore
+
+# Временные файлы и логи
+*.log
+*.tmp
+captures/
+
+# Другое
+.DS_Store
+.attach_pid*
