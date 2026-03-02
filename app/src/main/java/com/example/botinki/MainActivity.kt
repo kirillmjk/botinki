@@ -11,37 +11,35 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.botinki.ui.theme.BotinkiTheme
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.example.botinki.ui.theme.LaptevTheme
+import com.example.botinki.ui.view.LoginScreen
+import com.example.botinki.ui.view.Onboard1Screen
+import com.example.botinki.ui.view.Onboard2Screen
+import com.example.botinki.ui.view.Onboard3Screen
+import com.example.botinki.ui.view.RegisterScreen
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            BotinkiTheme {
+            LaptevTheme {
+                val navController = rememberNavController()
                 Scaffold(modifier = Modifier.fillMaxSize()) { innerPadding ->
-                    Greeting(
-                        name = "Android",
+                    NavHost(
+                        navController = navController,
+                        startDestination = "onboard1",
                         modifier = Modifier.padding(innerPadding)
-                    )
+                    ) {
+                        composable("onboard1") { Onboard1Screen(navController) }
+                        composable("onboard2") { Onboard2Screen(navController) }
+                        composable("onboard3") { Onboard3Screen(navController) }
+                        composable("login") { LoginScreen(navController = navController) }
+                        composable("register") { RegisterScreen(navController = navController) }
+                    }
                 }
             }
-        }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun GreetingPreview() {
-    BotinkiTheme {
-        Greeting("Android")
-    }
-}
+        }}}
