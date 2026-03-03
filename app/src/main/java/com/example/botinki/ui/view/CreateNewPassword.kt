@@ -1,0 +1,161 @@
+package com.example.tyagi_shop.ui.view
+
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
+import com.example.tyagi_shop.R
+import com.example.tyagi_shop.ui.viewModel.NewPasswordViewModel
+
+@Composable
+fun NewPasswordScreen(
+    navController: NavHostController,
+    email: String, // ВАЖНО: сюда передаём email из OTP‑экрана
+    viewModel: NewPasswordViewModel = viewModel()
+) {
+    var password by remember { mutableStateOf("") }
+    var confirmPassword by remember { mutableStateOf("") }
+    var showErrorDialog by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
+    val isValid = password.length >= 6 && password == confirmPassword
+
+    LaunchedEffect(viewModel.errorMessage.value) {
+        viewModel.errorMessage.value?.let { msg ->
+            errorMessage = msg
+            showErrorDialog = true
+            viewModel.errorMessage.value = null // Сбрасываем сообщение об ошибке
+        }
+    }
+    // AlertDialog
+    if (showErrorDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showErrorDialog = false
+                errorMessage = ""
+            },
+            title = { Text("Ошибка") },
+            text = { Text(errorMessage) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showErrorDialog = false
+                        errorMessage = ""
+                    }
+                ) {
+                    Text("OK")
+                }
+            }
+        )
+    }
+    Surface(modifier = Modifier.fillMaxSize(), color = Color.White) {
+        Column(modifier = Modifier.fillMaxSize().padding(24.dp)) {
+            Spacer(modifier = Modifier.height(50.dp))
+
+            // Кнопка Назад
+            Box(
+                modifier = Modifier
+                    .size(32.dp)
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(Color(0xFFF7F7F7))
+                    .clickable { navController.popBackStack() },
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.back_button),
+                    contentDescription = null,
+                    tint = Color.Black
+                )
+            }
+
+            Spacer(modifier = Modifier.height(30.dp))
+            Text(
+                "Задать новый пароль",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+            Text(
+                "Установите новый пароль для входа в\nвашу учетную запись",
+                fontSize = 14.sp,
+                color = Color.Gray,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(40.dp))
+            Text("Пароль", fontWeight = FontWeight.Medium)
+            Spacer(modifier = Modifier.height(6.dp))
+            OutlinedTextField(
+                value = password,
+                onValueChange = { password = it },
+                visualTransformation = PasswordVisualTransformation(),
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                placeholder = { Text("********") },
+                colors = OutlinedTextFieldDefaults.colors(
+                    unfocusedContainerColor = Color(0xFFF7F7F7),
+                    focusedContainerColor = Color(0xFFF7F7F7),
+                    unfocusedBorderColor = Color.Transparent,
+                    focusedBorderColor = Color.Transparent
+                )
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+            Text("Подтверждение пароля", fontWeight = FontWeight.Medium)
+            Spacer(modifier = Modifier.height(6.dp))
+            OutlinedTextField(
+                value = confirmPassword,
+                onValueChange = { confirmPassword = it },
+                visualTransformation = PasswordVisualTransformation(),
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(12.dp),
+                placeholder = { Text("********") },
+                colors = OutlinedTextFieldDefaults.colors(
+                    unfocusedContainerColor = Color(0xFFF7F7F7),
+                    focusedContainerColor = Color(0xFFF7F7F7),
+                    unfocusedBorderColor = Color.Transparent,
+                    focusedBorderColor = Color.Transparent
+                )
+            )
+
+            Spacer(modifier = Modifier.height(30.dp))
+            Button(
+                onClick = {
+                    viewModel.changePassword(email.trim(), password.trim(), navController)
+                },
+                enabled = isValid && !viewModel.isLoading.value,
+                modifier = Modifier.fillMaxWidth().height(50.dp),
+                shape = RoundedCornerShape(12.dp),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = Color(0xFF48B2E7),
+                    disabledContainerColor = Color(0xFF2B6B8B),
+                    contentColor = Color.White
+                )
+            ) {
+                if (viewModel.isLoading.value) {
+                    CircularProgressIndicator(
+                        color = Color.White,
+                        modifier = Modifier.size(20.dp)
+                    )
+                } else {
+                    Text("Сохранить")
+                }
+            }
+        }
+    }
+}
