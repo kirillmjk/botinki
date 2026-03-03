@@ -11,7 +11,6 @@ composeBom = "2024.09.00"
 uiGraphics = "1.10.0"
 foundation = "1.10.0"
 ui = "1.10.0"
-navigationCompose = "2.9.7"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -31,7 +30,6 @@ androidx-compose-material3 = { group = "androidx.compose.material3", name = "mat
 androidx-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics", version.ref = "uiGraphics" }
 androidx-compose-foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "foundation" }
 androidx-ui = { group = "androidx.compose.ui", name = "ui", version.ref = "ui" }
-androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

@@ -1,4 +1,4 @@
-package com.example.tyagi_shop.ui.view
+package com.example.botinki.ui.view
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -24,7 +24,7 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.tyagi_shop.R
+import com.example.botinki.R
 
 data class Product(
     val id: Int,

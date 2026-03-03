@@ -1,4 +1,4 @@
-package com.example.tyagi_shop.data.model
+package com.example.botinki.data.model
 
 data class ChangePasswordRequest(
     val email: String,

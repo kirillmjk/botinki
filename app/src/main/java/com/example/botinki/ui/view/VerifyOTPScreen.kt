@@ -1,15 +1,9 @@
-package com.example.tyagi_shop.ui.view
+package com.example.botinki.ui.view
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.KeyboardOptions
@@ -33,9 +27,9 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.example.tyagi_shop.R
-import com.example.tyagi_shop.ui.theme.MosyaginTheme
-import com.example.tyagi_shop.ui.viewModel.VerifyOTPViewModel
+import com.example.botinki.R
+import com.example.botinki.ui.theme.LaptevTheme
+import com.example.botinki.ui.viewModel.VerifyOTPViewModel
 
 @Composable
 fun VerifyOTPScreen(
@@ -250,7 +244,7 @@ fun OtpCell(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 fun VerifyOTPScreenPreview() {
-    MosyaginTheme {
+    LaptevTheme {
         val navController = rememberNavController()
         VerifyOTPScreen(
             navController = navController,

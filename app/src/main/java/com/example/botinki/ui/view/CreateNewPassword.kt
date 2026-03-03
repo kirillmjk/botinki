@@ -1,4 +1,4 @@
-package com.example.tyagi_shop.ui.view
+package com.example.botinki.ui.view
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,8 +18,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.example.tyagi_shop.R
-import com.example.tyagi_shop.ui.viewModel.NewPasswordViewModel
+import com.example.botinki.R
+import com.example.botinki.ui.viewModel.NewPasswordViewModel
 
 @Composable
 fun NewPasswordScreen(

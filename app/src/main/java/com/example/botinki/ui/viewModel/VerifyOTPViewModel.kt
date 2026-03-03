@@ -1,4 +1,4 @@
-package com.example.tyagi_shop.ui.viewModel
+package com.example.botinki.ui.viewModel
 
 import android.content.Context
 import android.widget.Toast
@@ -6,8 +6,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
-import com.example.tyagi_shop.data.RetrofitInstance
-import com.example.tyagi_shop.data.model.VerifyOtpRequest
+import com.example.botinki.data.RetrofitInstance
+import com.example.botinki.data.model.VerifyOtpRequest
 import kotlinx.coroutines.launch
 
 class VerifyOTPViewModel : ViewModel() {

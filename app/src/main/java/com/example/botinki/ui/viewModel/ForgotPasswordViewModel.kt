@@ -1,10 +1,10 @@
-package com.example.tyagi_shop.ui.viewModel
+package com.example.botinki.ui.viewModel
 
 import android.util.Log
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.tyagi_shop.data.RetrofitInstance
+import com.example.botinki.data.RetrofitInstance
 import kotlinx.coroutines.launch
 
 class ForgotPasswordViewModel : ViewModel() {

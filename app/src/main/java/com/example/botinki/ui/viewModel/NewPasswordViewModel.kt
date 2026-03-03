@@ -1,11 +1,11 @@
-package com.example.tyagi_shop.ui.viewModel
+package com.example.botinki.ui.viewModel
 
 import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavController
-import com.example.tyagi_shop.data.RetrofitInstance
-import com.example.tyagi_shop.data.model.ChangePasswordRequest
+import com.example.botinki.data.RetrofitInstance
+import com.example.botinki.data.model.ChangePasswordRequest
 import kotlinx.coroutines.launch
 
 class NewPasswordViewModel : ViewModel() {
