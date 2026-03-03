@@ -10,7 +10,7 @@ import java.util.concurrent.TimeUnit
 import kotlin.jvm.java
 
 object RetrofitInstance {
-    const val SUPABASE_URL = "https://ndnenkeazbogfldujbwd.supabase.co"
+    const val SUPABASE_URL = "https://ogkschzrzzdegxoaravd.supabase.co"
 
     private val proxy = Proxy(Proxy.Type.HTTP, InetSocketAddress("10.207.106.59", 3128))
     private val client = OkHttpClient.Builder()
