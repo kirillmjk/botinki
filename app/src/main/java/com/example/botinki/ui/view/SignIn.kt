@@ -43,7 +43,36 @@ fun LoginScreen(
     var password by remember { mutableStateOf("") }
     var showPassword by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
-
+    var showErrorDialog by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
+    LaunchedEffect(viewModel.errorMessage.value) {
+        viewModel.errorMessage.value?.let { msg ->
+            errorMessage = msg
+            showErrorDialog = true
+            viewModel.errorMessage.value = null // Сбрасываем сообщение об ошибке
+        }
+    }
+    // AlertDialog
+    if (showErrorDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showErrorDialog = false
+                errorMessage = ""
+            },
+            title = { Text("Ошибка") },
+            text = { Text(errorMessage) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showErrorDialog = false
+                        errorMessage = ""
+                    }
+                ) {
+                    Text("OK")
+                }
+            }
+        )
+    }
     Surface(
         modifier = modifier.fillMaxSize(),
         color = Color.White
@@ -157,11 +186,7 @@ fun LoginScreen(
                         navController.navigate("forgot_password")
                     }
             )
-
-
             Spacer(modifier = Modifier.height(28.dp))
-
-            // Кнопка Войти
             Button(
                 onClick = {
                     viewModel.signIn(
@@ -184,11 +209,7 @@ fun LoginScreen(
                     fontWeight = FontWeight.Medium
                 )
             }
-
-            // Заполнитель пространства
             Spacer(modifier = Modifier.weight(1f))
-
-            // Низ: "Вы впервые? Создать"
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -202,7 +223,7 @@ fun LoginScreen(
                     color = Color(0xFF9E9E9E)
                 )
                 Text(
-                    text = " Создать",
+                    text = " Создать пользователя",
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Medium,
                     color = Color(0xFF333333),
@@ -215,7 +236,6 @@ fun LoginScreen(
     }
 }
 
-// Переиспользуемый компонент для ввода текста (копия для автономности файла)
 @Composable
 private fun StyledTextField(
     value: String,
@@ -242,6 +262,7 @@ private fun StyledTextField(
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType),
         shape = RoundedCornerShape(18.dp),
         colors = OutlinedTextFieldDefaults.colors(
+
             focusedTextColor = Color(0xFF333333),
             unfocusedTextColor = Color(0xFF333333),
             focusedContainerColor = Color(0xFFF7F7F7),

@@ -31,16 +31,25 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
+import com.example.botinki.ui.theme.LaptevTheme
 import com.example.botinki.R
 import com.example.botinki.ui.theme.LaptevTheme
 import com.example.botinki.ui.viewModel.SignUpViewModel
 
+fun isValidEmail(email: String): Boolean { // написал функцию Мосягин Антоша 02.03.2026 16:17:44
+    return android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()
+}
 @Composable
 fun RegisterScreen(
     modifier: Modifier = Modifier,
     navController: NavHostController,
     viewModel: SignUpViewModel = viewModel()
 ) {
+
+    var showAlert by remember { mutableStateOf(false) }
+    var alertMessage by remember { mutableStateOf("") }
+
+    val viewModel: SignUpViewModel = viewModel()
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
@@ -48,6 +57,8 @@ fun RegisterScreen(
     var isTermsAccepted by remember { mutableStateOf(false) }
     val scrollState = rememberScrollState()
     val context = LocalContext.current
+    var showErrorDialog by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
 
     val isFormValid = name.isNotBlank() &&
             android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() &&
@@ -56,10 +67,32 @@ fun RegisterScreen(
 
     LaunchedEffect(viewModel.errorMessage.value) {
         viewModel.errorMessage.value?.let { msg ->
-            Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+            errorMessage = msg
+            showErrorDialog = true
+            viewModel.errorMessage.value = null // Сбрасываем сообщение об ошибке
         }
     }
-
+    // AlertDialog
+    if (showErrorDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showErrorDialog = false
+                errorMessage = ""
+            },
+            title = { Text("Ошибка") },
+            text = { Text(errorMessage) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showErrorDialog = false
+                        errorMessage = ""
+                    }
+                ) {
+                    Text("OK")
+                }
+            }
+        )
+    }
     Surface(
         modifier = modifier.fillMaxSize(),
         color = Color.White
@@ -92,7 +125,7 @@ fun RegisterScreen(
 
             Text("Регистрация", fontSize = 30.sp, fontWeight = FontWeight.SemiBold, color = Color(0xFF333333), textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
             Spacer(modifier = Modifier.height(4.dp))
-            Text("Заполните Свои Данные", fontSize = 14.sp, color = Color(0xFFB0B0B0), textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
+            Text("Заполните свои данные", fontSize = 14.sp, color = Color(0xFFB0B0B0), textAlign = TextAlign.Center, modifier = Modifier.fillMaxWidth())
 
             Spacer(modifier = Modifier.height(40.dp))
 
@@ -133,7 +166,15 @@ fun RegisterScreen(
             // Кнопка
             Button(
                 onClick = {
-                    viewModel.signUp(email.trim(), password.trim(), navController)
+                    if (!isValidEmail(email.trim())) {
+                        alertMessage = "Введите корректный почтовый адрес"
+                        showAlert = true
+                    } else if (password.trim().length < 6) {
+                        alertMessage = "Пароль должен содержать минимум 6 символов"
+                        showAlert = true
+                    } else {
+                        viewModel.signUp(email.trim(), password.trim(), navController)
+                    }
                 },
                 modifier = Modifier
                     .fillMaxWidth()
@@ -145,7 +186,7 @@ fun RegisterScreen(
                     disabledContainerColor = Color(0xFF2B6B8B),
                     disabledContentColor = Color.White
                 ),
-                enabled = isFormValid && !viewModel.isLoading.value
+                enabled = isFormValid && !viewModel.isLoading.value  && isTermsAccepted
             ) {
                 if (viewModel.isLoading.value) {
                     CircularProgressIndicator(color = Color.White, modifier = Modifier.size(24.dp))
@@ -163,6 +204,20 @@ fun RegisterScreen(
                 Text("Есть аккаунт? ", fontSize = 13.sp, color = Color(0xFF9E9E9E))
                 Text("Войти", fontSize = 13.sp, fontWeight = FontWeight.Medium, color = Color(0xFF333333), modifier = Modifier.clickable { navController.navigate("login") })
             }
+        }
+        if (showAlert) {
+            AlertDialog(
+                onDismissRequest = { showAlert = false },
+                title = { Text("Ошибка") },
+                text = { Text(alertMessage) },
+                confirmButton = {
+                    TextButton(
+                        onClick = { showAlert = false }
+                    ) {
+                        Text("OK")
+                    }
+                }
+            )
         }
     }
 }

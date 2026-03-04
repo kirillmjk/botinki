@@ -114,7 +114,6 @@ fun HomeScreen(navController: NavHostController) {
                         selected = isSelected,
                         onClick = {
                             selectedCategory = category
-                            // переход на каталог с выбранной категорией
                             navController.navigate("catalog/$category")
                         }
                     )

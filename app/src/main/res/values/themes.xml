@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <style name="Theme.Botinki.Splash" parent="android:Theme.Material.Light.NoActionBar" >
-        <item name="android:windowBackground">@color/accsent</item>
-        <item name="android:windowFullscreen">true</item>
+    <style name="Theme.botinki" parent="Theme.Material3.Light.NoActionBar" />
+
+    <style name="Theme.botinki.Splash" parent="Theme.SplashScreen">
+        <item name="windowSplashScreenBackground">@color/splash_background</item>
+        <item name="windowSplashScreenAnimatedIcon">@drawable/prilico</item>
+        <item name="postSplashScreenTheme">@style/Theme.botinki</item>
     </style>
 </resources>

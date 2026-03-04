@@ -3,22 +3,18 @@ package com.example.botinki.ui.view
 import android.annotation.SuppressLint
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -26,11 +22,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.example.botinki.R
-import kotlin.text.isNotEmpty
 
 @SuppressLint("Range")
 @Composable
 fun Onboard1Screen(navController: NavHostController) {
+    var totalDrag by remember { mutableStateOf(0f) }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -44,36 +41,54 @@ fun Onboard1Screen(navController: NavHostController) {
                 )
             )
     ) {
+        // Отдельный слой для обработки свайпов (поверх всего, кроме кнопки)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .pointerInput(Unit) {
+                    detectHorizontalDragGestures(
+                        onHorizontalDrag = { _, dragAmount ->
+                            totalDrag += dragAmount
+                        },
+                        onDragEnd = {
+                            when {
+                                totalDrag > 200 -> navController.navigate("onboard3")
+                                totalDrag < -200 -> navController.navigate("onboard2")
+                            }
+                            totalDrag = 0f // Сбрасываем после навигации
+                        },
+                        onDragStart = { totalDrag = 0f } // Сбрасываем при старте
+                    )
+                }
+        )
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 24.dp, vertical = 32.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
-
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.End
             ) {
+                Spacer(modifier = Modifier.height(20.dp))
+                Text(
+                    text = "ДОБРО\nПОЖАЛОВАТЬ",
+                    fontSize = 32.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(180.dp))
                 Image(
                     painter = painterResource(id = R.drawable.onboard1),
                     contentDescription = null,
                     modifier = Modifier
                         .fillMaxWidth(1.15f)
                         .height(320.dp)
-                        .offset(x = 20.dp, y = (-20).dp)
-                )
-
-                Spacer(modifier = Modifier.height(24.dp))
-
-                Text(
-                    text = "ДОБРО\nПОЖАЛОВАТЬ",
-                    fontSize = 26.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
+                        .offset(x = 30.dp, y = (-20).dp)
                 )
 
                 Spacer(modifier = Modifier.height(24.dp))
@@ -91,7 +106,7 @@ fun Onboard1Screen(navController: NavHostController) {
                                 .height(6.dp)
                                 .background(
                                     color = if (index == 0) Color.White else Color(0x55FFFFFF),
-                                    shape = androidx.compose.foundation.shape.RoundedCornerShape(3.dp)
+                                    shape = RoundedCornerShape(3.dp)
                                 )
                         )
                     }
@@ -99,13 +114,11 @@ fun Onboard1Screen(navController: NavHostController) {
             }
 
             Button(
-                onClick = {
-                    navController.navigate("onboard2")
-                          },
+                onClick = { navController.navigate("onboard2") },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp),
-                shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp),
+                shape = RoundedCornerShape(20.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.White,
                     contentColor = Color(0xFF48B2E7)
@@ -125,7 +138,10 @@ fun Onboard2Screen(navController: NavHostController) {
         subtitle = "Умная, великолепная и модная\nколлекция. Изучите сейчас",
         buttonText = "Далее",
         onButtonClick = { navController.navigate("onboard3") },
-        indicatorIndex = 1
+        indicatorIndex = 1,
+        navController = navController,
+        nextRoute = "onboard1",
+        prevRoute = "onboard3"
     )
 }
 
@@ -134,10 +150,13 @@ fun Onboard3Screen(navController: NavHostController) {
     OnboardBase(
         imageRes = R.drawable.onboard3,
         title = "У Вас Есть Сила,\nЧтобы",
-        subtitle = "В вашей комнате много красивых\nи привлекательных растений",
+        subtitle = "В Вашей Комнате Много Красивых\nИ Привлекательных Растений",
         buttonText = "Далее",
         onButtonClick = { navController.navigate("register") },
-        indicatorIndex = 2
+        indicatorIndex = 2,
+        navController = navController,
+        nextRoute = "onboard2",
+        prevRoute = "register"
     )
 }
 
@@ -149,8 +168,13 @@ private fun OnboardBase(
     subtitle: String,
     buttonText: String,
     onButtonClick: () -> Unit,
-    indicatorIndex: Int
+    indicatorIndex: Int,
+    navController: NavHostController,
+    nextRoute: String,
+    prevRoute: String
 ) {
+    var totalDrag by remember { mutableStateOf(0f) }
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -164,28 +188,48 @@ private fun OnboardBase(
                 )
             )
     ) {
+        // Слой для обработки свайпов
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .pointerInput(Unit) {
+                    detectHorizontalDragGestures(
+                        onHorizontalDrag = { _, dragAmount ->
+                            totalDrag += dragAmount
+                        },
+                        onDragEnd = {
+                            when {
+                                totalDrag > 200 -> navController.navigate(nextRoute)
+                                totalDrag < -200 -> navController.navigate(prevRoute)
+                            }
+                            totalDrag = 0f
+                        },
+                        onDragStart = { totalDrag = 0f }
+                    )
+                }
+        )
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(horizontal = 24.dp, vertical = 32.dp),
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            Spacer(modifier = Modifier.height(16.dp))
-
             Column(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
+                Spacer(modifier = Modifier.height(130.dp))
+
                 Image(
                     painter = painterResource(id = imageRes),
                     contentDescription = null,
                     modifier = Modifier
-                        .fillMaxWidth(1.25f)
+                        .fillMaxWidth()
                         .height(340.dp)
-                        .offset(y = (-40).dp)
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
                 Text(
                     text = title,
@@ -209,7 +253,8 @@ private fun OnboardBase(
 
                 Row(
                     horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     repeat(3) { index ->
                         Box(
@@ -218,10 +263,8 @@ private fun OnboardBase(
                                 .width(if (index == indicatorIndex) 24.dp else 8.dp)
                                 .height(6.dp)
                                 .background(
-                                    color = if (index == indicatorIndex) Color.White else Color(
-                                        0x55FFFFFF
-                                    ),
-                                    shape = androidx.compose.foundation.shape.RoundedCornerShape(3.dp)
+                                    color = if (index == indicatorIndex) Color.White else Color(0x55FFFFFF),
+                                    shape = RoundedCornerShape(3.dp)
                                 )
                         )
                     }
@@ -233,7 +276,7 @@ private fun OnboardBase(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(52.dp),
-                shape = androidx.compose.foundation.shape.RoundedCornerShape(20.dp),
+                shape = RoundedCornerShape(20.dp),
                 colors = ButtonDefaults.buttonColors(
                     containerColor = Color.White,
                     contentColor = Color(0xFF48B2E7)
