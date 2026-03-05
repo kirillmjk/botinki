@@ -50,13 +50,16 @@ interface UserManagementService {
     @POST("change-password")
     suspend fun changePassword(@Body body: ChangePasswordRequest): Response<Any>
 
-    @Headers("apikey: $API_KEY")
+    @Headers("apikey: $API_KEY", "Content-Type: application/json", "Authorization: Bearer $API_KEY")
+    @POST("rest/v1/favourite")
+    suspend fun addToFavourite(@Body favouriteRequest: FavouriteRequest): Response<Any>
+
+    @Headers("apikey: $API_KEY", "Authorization: Bearer $API_KEY")
     @GET("rest/v1/profiles")
     suspend fun getProfile(
-        @Header("Authorization") authHeader: String,
         @Query("user_id") userIdFilter: String, // "eq.<uuid>"
         @Query("select") select: String = "*"
-    ): List<ProfileDto>
+    ): List<com.example.botinki.data.service.ProfileDto>
 
     @Headers("apikey: $API_KEY", "Content-Type: application/json")
     @PUT("rest/v1/profiles")
@@ -71,7 +74,7 @@ interface UserManagementService {
     suspend fun getProducts(
         @Header("Authorization") authHeader: String,
         @Query("select") select: String = "*"
-    ): List<ProductDto>
+    ): List<com.example.botinki.data.service.ProductDto>
 
     @Headers("apikey: $API_KEY")
     @GET("rest/v1/favourite")
@@ -79,7 +82,28 @@ interface UserManagementService {
         @Header("Authorization") authHeader: String,
         @Query("user_id") userIdFilter: String, // "eq.<uuid>"
         @Query("select") select: String = "id,product_id,user_id"
-    ): List<FavouriteDto>
+    ): List<com.example.botinki.data.service.FavouriteDto>
+
+    @Headers("apikey: $API_KEY", "Content-Type: application/json")
+    @PATCH("rest/v1/profiles")
+    suspend fun editProfile(
+        @Header("Authorization") authHeader: String,
+        @Body body: ProfileRequest
+    ): Response<Unit>
+
+    @Headers("apikey: $API_KEY", "Content-Type: application/json")
+    @POST("rest/v1/profiles")
+    suspend fun addProfile(
+        @Header("Authorization") authHeader: String,
+        @Body body: ProfileRequest
+    ): Response<Unit>
+
+    @Headers("apikey: $API_KEY", "Content-Type: application/json")
+    @POST("rest/v1/favourite")
+    suspend fun addFavourite(
+        @Header("Authorization") authHeader: String,
+        @Body body: FavouriteRequest
+    ): Response<Unit>
 
     @Headers("apikey: $API_KEY")
     @DELETE("rest/v1/favourite")

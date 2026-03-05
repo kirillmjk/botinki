@@ -8,12 +8,8 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -21,18 +17,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.botinki.data.UserSession
 import com.example.botinki.ui.theme.LaptevTheme
-import com.example.botinki.ui.view.ForgotPasswordScreen
-import com.example.botinki.ui.view.HomeScreen
-import com.example.botinki.ui.view.NewPasswordScreen
-import com.example.botinki.ui.view.Onboard1Screen
-import com.example.botinki.ui.view.Onboard2Screen
-import com.example.botinki.ui.view.Onboard3Screen
-import com.example.botinki.ui.view.ProfileScreen
-import com.example.botinki.ui.view.VerifyOTPScreen
-import com.example.botinki.ui.view.LoginScreen
-import com.example.botinki.ui.view.RegisterScreen
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.example.botinki.ui.view.*
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -94,10 +79,43 @@ class MainActivity : ComponentActivity() {
                                 LoginScreen(navController = navController)
                             }
                         }
+                        composable("favorite") {
+                            FavoriteScreen(navController = navController)
+                        }
+                        composable(
+                            route = "catalog/{category}",
+                            arguments = listOf(
+                                navArgument("category") { type = NavType.StringType }
+                            )
+                        ) { backStackEntry ->
+                            val category =
+                                backStackEntry.arguments?.getString("category") ?: "Outdoor"
+                            CatalogScreen(
+                                navController = navController,
+                                initialCategoryTitle = category
+                            )
+                        }
+                        composable("catalog") {
+                            CatalogScreen(
+                                navController = navController,
+                                initialCategoryTitle = "Outdoor"
+                            )
+                        }
+                        composable(
+                            route = "details/{productId}",
+                            arguments = listOf(
+                                navArgument("productId") { type = NavType.StringType }
+                            )
+                        ) { backStackEntry ->
+                            val productId = backStackEntry.arguments?.getString("productId") ?: ""
+                            DetailsScreen(
+                                navController = navController,
+                                productId = productId
+                            )
+                        }
                     }
                 }
             }
         }
     }
 }
-

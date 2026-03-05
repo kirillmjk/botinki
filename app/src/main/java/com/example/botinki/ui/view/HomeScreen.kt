@@ -1,5 +1,6 @@
 package com.example.botinki.ui.view
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -23,26 +24,61 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import com.example.botinki.R
+import com.example.botinki.data.UserSession
+import com.example.botinki.ui.viewModel.HomeViewModel
+import com.example.botinki.ui.viewModel.SignUpViewModel
 
 data class Product(
-    val id: Int,
+    val id: String,
     val name: String,
     val price: String,
     val imageRes: Int
 )
 
 @Composable
-fun HomeScreen(navController: NavHostController) {
+fun HomeScreen(navController: NavHostController, viewModel: SignUpViewModel = viewModel(), viewModel2: HomeViewModel = viewModel()) {
     val scrollState = rememberScrollState()
-
     val categories = listOf("Все", "Outdoor", "Tennis")
     var selectedCategory by remember { mutableStateOf("Все") }
 
+    var showErrorDialog by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf("") }
+
+    //val favouriteProducts = mutableStateListOf<String>()
+    LaunchedEffect(viewModel.errorMessage.value) {
+        viewModel.errorMessage.value?.let { msg ->
+            errorMessage = msg
+            showErrorDialog = true
+            viewModel.errorMessage.value = null // Сбрасываем сообщение об ошибке
+        }
+    }
+    // AlertDialog
+    if (showErrorDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showErrorDialog = false
+                errorMessage = ""
+            },
+            title = { Text("Ошибка") },
+            text = { Text(errorMessage) },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        showErrorDialog = false
+                        errorMessage = ""
+                    }
+                ) {
+                    Text("OK")
+                }
+            }
+        )
+    }
     val products = listOf(
-        Product(1, "Nike Air Max", "₽752.00", R.drawable.img_shoe_blue),
-        Product(2, "Nike Air Max", "₽752.00", R.drawable.img_shoe_blue)
+        Product("21c2d7c0-a2ea-49a2-9198-52bafafc6958", "Nike Air Max", "₽752.00", R.drawable.img_shoe_blue),
+        Product("64229908-3713-4147-bedc-68ddaef9c67a", "Nike Air Max", "₽752.00", R.drawable.img_shoe_blue)
     )
 
     Scaffold(
@@ -146,7 +182,11 @@ fun HomeScreen(navController: NavHostController) {
                 horizontalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(products) { product ->
-                    ProductCard(product = product)
+                    ProductCard(
+                        product = product,
+                        viewModel = viewModel2,
+                        navController = navController
+                    )
                 }
             }
 
@@ -232,13 +272,19 @@ private fun CategoryChip(
 }
 
 @Composable
-private fun ProductCard(product: Product) {
+private fun ProductCard(
+    product: Product,
+    viewModel: HomeViewModel,
+    navController: NavHostController
+) {
+    var isFavourite by remember { mutableStateOf(false) }
     Box(
         modifier = Modifier
             .width(180.dp)
             .clip(RoundedCornerShape(16.dp))
             .background(Color.White)
             .padding(12.dp)
+            .clickable{navController.navigate("details/${product.id}")}
     ) {
         Column {
             Row(
@@ -246,9 +292,15 @@ private fun ProductCard(product: Product) {
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_favorite_border),
+                    modifier = Modifier.clickable {
+                        isFavourite = !isFavourite
+                    },
+                    painter = if (isFavourite)
+                        painterResource(id = R.drawable.ic_heart_fill4)
+                    else
+                        painterResource(id = R.drawable.ic_favorite_border),
                     contentDescription = "Favorite",
-                    tint = Color(0xFFB0B0B0)
+                    tint = if (isFavourite) Color.Red else Color(0xFFB0B0B0)
                 )
             }
 

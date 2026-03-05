@@ -3,6 +3,7 @@ package com.example.botinki.ui.view
 import android.Manifest
 import android.content.pm.PackageManager
 import android.net.Uri
+import android.provider.ContactsContract
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -39,11 +40,14 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.botinki.R
 import com.example.botinki.data.RetrofitInstance
+import com.example.botinki.data.UserSession
 import com.example.botinki.data.service.ProfileDto
+import com.example.botinki.ui.viewModel.ProfileViewModel
 import kotlinx.coroutines.launch
 import java.io.File
 import kotlin.collections.firstOrNull
@@ -74,7 +78,7 @@ fun ProfileScreen(
     // ---------- камера ----------
     val tmpImageUri = remember {
         val file = File(context.cacheDir, "profile_photo.jpg")
-        FileProvider.getUriForFile(context, "com.example.tyagi_shop.provider", file)
+        FileProvider.getUriForFile(context, "com.example.botinki.provider", file)
     }
     val cameraLauncher =
         rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) { success ->
@@ -91,13 +95,11 @@ fun ProfileScreen(
         if (ok) cameraLauncher.launch(tmpImageUri) else permissionLauncher.launch(Manifest.permission.CAMERA)
     }
 
-    // ---------- загрузка профиля ----------
     LaunchedEffect(userId, accessToken) {
         isLoading = true
         try {
             val service = RetrofitInstance.userManagementService
             val list: List<ProfileDto> = service.getProfile(
-                authHeader = "Bearer $accessToken",
                 userIdFilter = "eq.$userId"
             )
             val profile = list.firstOrNull()
@@ -131,7 +133,11 @@ fun ProfileScreen(
                         end = 24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                TopHeader(isEditing = isEditing, onEditClick = { isEditing = !isEditing })
+                val viewModel: ProfileViewModel = viewModel()
+                TopHeader(
+                    isEditing = isEditing, onEditClick = { isEditing = !isEditing },
+                    viewModel= viewModel,
+                    avatarUri.toString(), firstName, lastName, address, phone)
                 Spacer(modifier = Modifier.height(28.dp))
                 AvatarSection(
                     avatarUri = avatarUri,
@@ -233,7 +239,8 @@ fun ProfileScreen(
 // ---------- вспомогательные composable ----------
 
 @Composable
-fun TopHeader(isEditing: Boolean, onEditClick: () -> Unit) {
+fun TopHeader(isEditing: Boolean, onEditClick: () -> Unit, viewModel: ProfileViewModel = viewModel(), photoUri: String
+              , firstname: String, lastname: String, address: String, phone: String) {
     Box(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = "Профиль",
@@ -254,7 +261,12 @@ fun TopHeader(isEditing: Boolean, onEditClick: () -> Unit) {
         ) {
             if (isEditing) {
                 Text(
-                    "Готово",
+                    modifier = Modifier.clickable(
+                        onClick = {
+                            viewModel.editProfile(UserSession.userId.toString(), photoUri, firstname, lastname, address, phone)
+                        }
+                    ),
+                    text = "Готово",
                     fontSize = 12.sp,
                     color = Color(0xFF48B2E7),
                     fontWeight = FontWeight.Bold
