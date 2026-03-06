@@ -13,7 +13,8 @@ data class ProfileDto(
     val firstname: String?,
     val lastname: String?,
     val address: String?,
-    val phone: String?
+    val phone: String?,
+    val created_at: String?
 )
 data class FavouriteDto(
     val id: String?,
@@ -54,19 +55,20 @@ interface UserManagementService {
     @POST("rest/v1/favourite")
     suspend fun addToFavourite(@Body favouriteRequest: FavouriteRequest): Response<Any>
 
-    @Headers("apikey: $API_KEY", "Authorization: Bearer $API_KEY")
+    @Headers("apikey: $API_KEY")
     @GET("rest/v1/profiles")
     suspend fun getProfile(
+        @Header("Authorization") authHeader: String,
         @Query("user_id") userIdFilter: String, // "eq.<uuid>"
         @Query("select") select: String = "*"
-    ): List<com.example.botinki.data.service.ProfileDto>
+    ): Response<List<ProfileDto>>
 
     @Headers("apikey: $API_KEY", "Content-Type: application/json")
-    @PUT("rest/v1/profiles")
+    @PATCH("rest/v1/profiles")
     suspend fun updateProfile(
         @Header("Authorization") authHeader: String,
         @Query("user_id") userIdFilter: String,
-        @Body body: Map<String, Any?>
+        @Body body: Map<String, Any>
     ): Response<Unit>
 
     @Headers("apikey: $API_KEY")
@@ -88,6 +90,7 @@ interface UserManagementService {
     @PATCH("rest/v1/profiles")
     suspend fun editProfile(
         @Header("Authorization") authHeader: String,
+        @Query("user_id") userIdFilter: String,  // Добавили фильтр
         @Body body: ProfileRequest
     ): Response<Unit>
 
