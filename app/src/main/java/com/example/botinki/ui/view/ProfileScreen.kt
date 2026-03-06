@@ -98,20 +98,36 @@ fun ProfileScreen(
     LaunchedEffect(userId, accessToken) {
         isLoading = true
         try {
+            Log.d("ProfileScreen", "Загружаем профиль для userId: $userId")
+            Log.d("ProfileScreen", "AccessToken: ${accessToken.take(20)}...")
+
             val service = RetrofitInstance.userManagementService
-            val list: List<ProfileDto> = service.getProfile(
+            val response = service.getProfile(
+                authHeader = "Bearer $accessToken",
                 userIdFilter = "eq.$userId"
             )
-            val profile = list.firstOrNull()
-            if (profile != null) {
-                firstName = profile.firstname.orEmpty()
-                lastName = profile.lastname.orEmpty()
-                address = profile.address.orEmpty()
-                phone = profile.phone.orEmpty()
+
+            if (response.isSuccessful) {
+                val list = response.body()
+                Log.d("ProfileScreen", "Получен ответ: $list")
+
+                val profile = list?.firstOrNull()
+                if (profile != null) {
+                    firstName = profile.firstname.orEmpty()
+                    lastName = profile.lastname.orEmpty()
+                    address = profile.address.orEmpty()
+                    phone = profile.phone.orEmpty()
+                    Log.d("ProfileScreen", "Профиль загружен: $firstName $lastName")
+                } else {
+                    Log.e("ProfileScreen", "Профиль не найден для userId: $userId")
+                    errorText = "Профиль не найден"
+                }
             } else {
-                errorText = "Профиль не найден"
+                Log.e("ProfileScreen", "Ошибка ответа: ${response.code()}")
+                errorText = "Ошибка загрузки профиля: ${response.code()}"
             }
         } catch (e: Exception) {
+            Log.e("ProfileScreen", "Ошибка загрузки", e)
             errorText = "Не удалось загрузить профиль: ${e.localizedMessage}"
         } finally {
             isLoading = false

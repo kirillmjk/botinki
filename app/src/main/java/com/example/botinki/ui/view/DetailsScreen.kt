@@ -166,7 +166,7 @@ fun DetailsScreen(
                             )
                         }
                         Text(
-                            text = "Магазин Тяги",
+                            text = "ShoeStore",
                             fontSize = 16.sp,
                             fontWeight = FontWeight.SemiBold
                         )
